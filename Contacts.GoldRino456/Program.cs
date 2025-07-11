@@ -1,2 +1,6 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using PhoneBook.GoldRino456;
+
+string conn = "";
+AppConfig.FetchConnectionString(out conn);
+
+Console.WriteLine(conn);

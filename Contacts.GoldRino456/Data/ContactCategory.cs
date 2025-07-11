@@ -1,4 +1,4 @@
-﻿namespace Contacts.GoldRino456.Models;
+﻿namespace PhoneBook.GoldRino456.Data;
 public class ContactCategory
 {
     public int Id { get; set; }
