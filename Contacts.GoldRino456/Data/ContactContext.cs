@@ -6,13 +6,18 @@ public class ContactContext : DbContext
     public DbSet<ContactEntry> Contacts { get; set; }
     public DbSet<ContactCategory> ContactCategories { get; set; }
 
-    public string DbPath { get; }
+    public readonly string _connectionString;
 
     public ContactContext(string connectionString)
     {
-        DbPath = connectionString;
+        if(string.IsNullOrEmpty(connectionString))
+        {
+            throw new ArgumentException("ConnectionString was null or empty", nameof(connectionString));
+        }
+        
+        _connectionString = connectionString;
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer(DbPath);
+        => optionsBuilder.UseSqlServer(_connectionString);
 }

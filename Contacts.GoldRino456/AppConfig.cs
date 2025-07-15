@@ -5,7 +5,7 @@ public static class AppConfig
 {
     public static bool FetchConnectionString(out string? connectionString)
     {
-        string workingDirectory = Path.GetFullPath(@"..\..\..\");
+        string workingDirectory = AppContext.BaseDirectory;
 
         IConfiguration config = new ConfigurationBuilder()
                     .SetBasePath(workingDirectory)
@@ -14,6 +14,6 @@ public static class AppConfig
 
         connectionString = config.GetConnectionString("DefaultConnection");
 
-        return !String.IsNullOrWhiteSpace(connectionString);
+        return !string.IsNullOrWhiteSpace(connectionString);
     }
 }
