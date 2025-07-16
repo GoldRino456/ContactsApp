@@ -1,6 +1,29 @@
 ﻿using PhoneBook.GoldRino456;
+using PhoneBook.GoldRino456.Data;
 
-string conn = "";
-AppConfig.FetchConnectionString(out conn);
+class Program
+{
+    static void Main()
+    {
+        if(AppConfig.FetchConnectionString(out var connectionString))
+        {
+            throw new Exception("Could not find connection string.");
+        }
 
-Console.WriteLine(conn);
+        using var context = new ContactContext(connectionString);
+
+        //Display Menu Options
+    }
+
+    enum MenuOptions
+    {
+        CreateContact,
+        UpdateContact,
+        ViewContacts,
+        DeleteContact,
+        CreateCategory,
+        UpdateCategory,
+        DeleteCategory,
+        Quit
+    }
+}
