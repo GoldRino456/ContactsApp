@@ -24,6 +24,7 @@ class Program
             switch(choice)
             {
                 case MenuOptions.CreateContact:
+                    MenuManager.ProcessCreateContact();
                     break;
 
                 case MenuOptions.UpdateContact:
