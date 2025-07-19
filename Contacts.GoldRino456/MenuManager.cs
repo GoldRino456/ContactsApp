@@ -12,6 +12,18 @@ public static class MenuManager
         var email = DisplayUtils.PromptUserForStringInput("Please enter the contact's email address: ");
         //Add option to place contact in category here.
 
+        var isRequestingCategoryPrompt = DisplayUtils.PromptUserForYesOrNoSelection("Would You Like To Add This Contact To A Category?");
+
+        if(isRequestingCategoryPrompt)
+        {
+
+        }
+
         //Create contact here.
+    }
+
+    public static void PromptUserForCategorySelection()
+    {
+        //Fetch all existing categories
     }
 }

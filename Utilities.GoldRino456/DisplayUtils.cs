@@ -15,6 +15,24 @@ public static class DisplayUtils
         return choices[selection];
     }
 
+    public static bool PromptUserForYesOrNoSelection(string promptText)
+    {
+        Dictionary<string, bool> choices = new Dictionary<string, bool>()
+        {
+            {"Yes", true},
+            {"No", false}
+        };
+
+        var selection = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+            .Title(promptText)
+            .PageSize(10)
+            .MoreChoicesText("[grey](Move up and down to see additional options)[/]")
+            .AddChoices(choices.Keys.ToArray()));
+
+        return choices[selection];
+    }
+
     public static void DisplayListAsTable(string[] columns, List<string[]> rows)
     {
         var table = new Table();
