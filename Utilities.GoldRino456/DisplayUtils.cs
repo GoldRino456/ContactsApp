@@ -3,6 +3,10 @@
 namespace Utilities.GoldRino456;
 public static class DisplayUtils
 {
+    public static void ClearScreen()
+    {
+        AnsiConsole.Clear();
+    }
     public static int PromptUserForIndexSelection(string promptText, Dictionary<string, int> choices)
     {
         var selection = AnsiConsole.Prompt(
@@ -76,6 +80,11 @@ public static class DisplayUtils
             }));
 
         return input;
+    }
+
+    public static void DisplayMessageToUser(string message)
+    {
+        AnsiConsole.WriteLine(message);
     }
 
     public static int PromptUserForIntegerInput(string prompt, int min, int max)

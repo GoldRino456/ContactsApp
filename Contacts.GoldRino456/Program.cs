@@ -19,6 +19,7 @@ class Program
         bool isAppRunning = true;
         while(isAppRunning)
         {
+            DisplayUtils.ClearScreen();
             var choice = DisplayMainMenu();
 
             switch(choice)

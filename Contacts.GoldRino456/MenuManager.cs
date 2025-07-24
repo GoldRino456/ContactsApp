@@ -1,5 +1,6 @@
 ﻿
 using PhoneBook.GoldRino456.Data;
+using System.Numerics;
 using Utilities.GoldRino456;
 
 namespace PhoneBook.GoldRino456;
@@ -8,21 +9,24 @@ public static class MenuManager
 {
     public static void ProcessCreateContact(ContactContext context)
     {
+        DisplayUtils.ClearScreen();
+
         ContactEntry contact = new();
+        bool isCancellingCreation = false;
 
-        var name = DisplayUtils.PromptUserForStringInput("Please enter the contact's name: ");
-        contact.Name = name;
+        isCancellingCreation = ProcessNameInput(contact);
+        if (isCancellingCreation) { return; }
 
-        var phone = DisplayUtils.PromptUserForStringInput("Please enter the contact's phone number: ");
-        contact.PhoneNumber = phone;
+        isCancellingCreation = ProcessPhoneInput(contact);
+        if (isCancellingCreation) { return; }
 
-        var email = DisplayUtils.PromptUserForStringInput("Please enter the contact's email address: ");
-        contact.Email = email;
+        isCancellingCreation = ProcessEmailInput(contact);
+        if (isCancellingCreation) { return; }
 
         ContactCategory? category = null;
         var isRequestingCategoryPrompt = DisplayUtils.PromptUserForYesOrNoSelection("Would You Like To Add This Contact To A Category?");
-   
-        if(isRequestingCategoryPrompt)
+
+        if (isRequestingCategoryPrompt)
         {
             category = PromptUserForCategorySelection(context);
         }
@@ -32,8 +36,83 @@ public static class MenuManager
         ConfirmContactDetails(contact, context);
     }
 
+    private static bool ProcessEmailInput(ContactEntry contact)
+    {
+        string email;
+
+        while(true)
+        {
+            email = DisplayUtils.PromptUserForStringInput("Please enter the contact's email address (or enter '0' to return to the menu): ");
+
+            if (email.Equals("0"))
+            {
+                return true;
+            }
+
+            if (ValidationUtils.ValidateEmailAddress(email))
+            {
+                break;
+            }
+            else
+            {
+                DisplayUtils.DisplayMessageToUser("Email is invalid. Please ensure email address is in the following format: johndoe@myemail.com");
+            }
+        }
+
+        contact.Email = email;
+        return false;
+    }
+
+    private static bool ProcessPhoneInput(ContactEntry contact)
+    {
+        string phone;
+
+        while(true)
+        {
+            phone = DisplayUtils.PromptUserForStringInput("Please enter the contact's phone number (or enter '0' to return to the menu): ");
+
+            if (phone.Equals("0")) //Return to menu
+            {
+                return true;
+            }
+
+            if(ValidationUtils.ValidatePhoneNumber(phone))
+            {
+                break;
+            }
+            else
+            {
+                DisplayUtils.DisplayMessageToUser("Phone Number is invalid. Please ensure phone number is in the following format: (123)-456-7890, 123-456-7890, or 1234567890.");
+            }
+        }
+
+        contact.PhoneNumber = phone;
+        return false;
+    }
+
+    private static bool ProcessNameInput(ContactEntry contact)
+    {
+        var name = DisplayUtils.PromptUserForStringInput("Please enter the contact's name (or enter '0' to return to the menu): ");
+
+        if (name.Equals("0"))
+        {
+            return true;
+        }
+
+        contact.Name = name;
+        return false;
+    }
+
     private static void ConfirmContactDetails(ContactEntry contact, ContactContext context)
     {
+        DisplayUtils.ClearScreen();
+        DisplayUtils.DisplayMessageToUser($"Contact Name: {contact.Name} \nEmail: {contact.Email} \nPhone Number: {contact.PhoneNumber}");
+
+        if(contact.Category != null)
+        {
+            DisplayUtils.DisplayMessageToUser($"Category: {contact.Category}");
+        }
+
         var isCorrect = DisplayUtils.PromptUserForYesOrNoSelection("Are the details for this contact correct?");
 
         if(isCorrect)
