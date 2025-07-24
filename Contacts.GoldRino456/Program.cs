@@ -32,6 +32,7 @@ class Program
                     break;
 
                 case MenuOptions.ViewContacts:
+                    MenuManager.ProcessViewContacts(context);
                     break;
 
                 case MenuOptions.DeleteContact:

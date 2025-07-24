@@ -99,4 +99,10 @@ public static class DisplayUtils
 
         return input;
     }
+
+    public static void PressAnyKeyToContinue()
+    {
+        Console.Write("Press any key to continue...");
+        Console.ReadKey();
+    }
 }

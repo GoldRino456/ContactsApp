@@ -36,6 +36,25 @@ public static class MenuManager
         ConfirmContactDetails(contact, context);
     }
 
+    public static void ProcessViewContacts(ContactContext context)
+    {
+        DisplayUtils.ClearScreen();
+        var contacts = context.Contacts.ToList();
+
+        string[] columns = ["Name", "Email", "Phone Number", "Category"];
+        List<string[]> rows = new();
+        
+        foreach( var contact in contacts )
+        {
+            var categoryString = contact.Category != null ? nameof(contact.Category) : "N/A";
+            string[] row = [contact.Name, contact.Email, contact.PhoneNumber, categoryString];
+            rows.Add(row);
+        }
+
+        DisplayUtils.DisplayListAsTable(columns, rows);
+        DisplayUtils.PressAnyKeyToContinue();
+    }
+
     private static bool ProcessEmailInput(ContactEntry contact)
     {
         string email;
@@ -125,7 +144,7 @@ public static class MenuManager
         ProcessCreateContact(context);
     }
 
-    public static ContactCategory? PromptUserForCategorySelection(ContactContext context)
+    private static ContactCategory? PromptUserForCategorySelection(ContactContext context)
     {
         List<ContactCategory> categories = context.ContactCategories.ToList();
         List<string> displayCategories = new();
