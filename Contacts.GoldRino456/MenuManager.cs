@@ -55,6 +55,17 @@ public static class MenuManager
         DisplayUtils.PressAnyKeyToContinue();
     }
 
+    public static void ProcessCreateCategory(ContactContext context)
+    {
+        DisplayUtils.ClearScreen();
+
+        ContactCategory category = new();
+        bool isCancellingCreation = false;
+
+        ProcessCategoryInput(category);
+        ConfirmCategoryDetails(category, context);
+    }
+
     private static bool ProcessEmailInput(ContactEntry contact)
     {
         string email;
@@ -122,6 +133,19 @@ public static class MenuManager
         return false;
     }
 
+    private static bool ProcessCategoryInput(ContactCategory category)
+    {
+        string categoryName = DisplayUtils.PromptUserForStringInput("Please enter the category's name (or enter '0' to return to the menu): ");
+
+        if(categoryName.Equals("0"))
+        {
+            return true;
+        }
+
+        category.Name = categoryName;
+        return false;
+    }
+
     private static void ConfirmContactDetails(ContactEntry contact, ContactContext context)
     {
         DisplayUtils.ClearScreen();
@@ -137,6 +161,22 @@ public static class MenuManager
         if(isCorrect)
         {
             context.Contacts.Add(contact);
+            context.SaveChanges();
+            return;
+        }
+
+        ProcessCreateContact(context);
+    }
+    private static void ConfirmCategoryDetails(ContactCategory category, ContactContext context)
+    {
+        DisplayUtils.ClearScreen();
+        DisplayUtils.DisplayMessageToUser($"New Category Name: {category.Name}");
+
+        var isCorrect = DisplayUtils.PromptUserForYesOrNoSelection("Are you sure you want to create a new category with this name?");
+
+        if (isCorrect)
+        {
+            context.ContactCategories.Add(category);
             context.SaveChanges();
             return;
         }

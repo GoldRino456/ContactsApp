@@ -39,6 +39,7 @@ class Program
                     break;
 
                 case MenuOptions.CreateCategory:
+                    MenuManager.ProcessCreateCategory(context);
                     break;
 
                 case MenuOptions.UpdateCategory:
