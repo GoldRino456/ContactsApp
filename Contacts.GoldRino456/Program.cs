@@ -29,6 +29,7 @@ class Program
                     break;
 
                 case MenuOptions.UpdateContact:
+                    MenuManager.ProcessUpdateContact(context);
                     break;
 
                 case MenuOptions.ViewContacts:

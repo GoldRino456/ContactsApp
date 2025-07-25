@@ -12,9 +12,12 @@ public static class MenuManager
         DisplayUtils.ClearScreen();
 
         ContactEntry contact = new();
-        bool isCancellingOperation = false;
+        CollectContactDetails(contact, context, true);
+    }
 
-        isCancellingOperation = ProcessNameInput(contact);
+    private static void CollectContactDetails(ContactEntry contact, ContactContext context, bool isNewContact)
+    {
+        bool isCancellingOperation = ProcessNameInput(contact);
         if (isCancellingOperation) { return; }
 
         isCancellingOperation = ProcessPhoneInput(contact);
@@ -33,7 +36,7 @@ public static class MenuManager
 
         contact.Category = category;
 
-        ConfirmContactDetails(contact, context);
+        ConfirmContactDetails(contact, context, isNewContact);
     }
 
     public static void ProcessUpdateContact(ContactContext context)
@@ -46,7 +49,9 @@ public static class MenuManager
             return; 
         }
 
-
+        DisplayUtils.ClearScreen();
+        DisplaySingleContact(selectedContact);
+        CollectContactDetails(selectedContact, context, false);
     }
 
     private static bool PromptUserForContactSelection(ContactContext context, out ContactEntry? selectedContact)
@@ -195,7 +200,7 @@ public static class MenuManager
         return false;
     }
 
-    private static void ConfirmContactDetails(ContactEntry contact, ContactContext context)
+    private static void ConfirmContactDetails(ContactEntry contact, ContactContext context, bool isNewContact)
     {
         DisplayUtils.ClearScreen();
         DisplayUtils.DisplayMessageToUser($"Contact Name: {contact.Name} \nEmail: {contact.Email} \nPhone Number: {contact.PhoneNumber}");
@@ -209,9 +214,18 @@ public static class MenuManager
 
         if(isCorrect)
         {
-            context.Contacts.Add(contact);
-            context.SaveChanges();
-            return;
+            if(isNewContact)
+            {
+                context.Contacts.Add(contact);
+                context.SaveChanges();
+                return;
+            }
+            else
+            {
+                context.Contacts.Update(contact);
+                context.SaveChanges();
+                return;
+            }
         }
 
         ProcessCreateContact(context);
@@ -232,6 +246,19 @@ public static class MenuManager
         }
 
         ProcessCreateContact(context);
+    }
+
+    private static void DisplaySingleContact(ContactEntry contact)
+    {
+        DisplayUtils.ClearScreen();
+        string[] columns = ["Name", "Email", "Phone Number", "Category"];
+        List<string[]> rows = new();
+
+        var categoryString = contact.Category != null ? nameof(contact.Category) : "N/A";
+        string[] row = [contact.Name, contact.Email, contact.PhoneNumber, categoryString];
+        rows.Add(row);
+
+        DisplayUtils.DisplayListAsTable(columns, rows);
     }
 
     private static List<ContactEntry> GetContactsByCategory(ContactContext context)
