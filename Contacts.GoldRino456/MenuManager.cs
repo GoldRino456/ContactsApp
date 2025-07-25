@@ -39,12 +39,12 @@ public static class MenuManager
     public static void ProcessViewContacts(ContactContext context)
     {
         DisplayUtils.ClearScreen();
-        var contacts = context.Contacts.ToList();
+        var contacts = GetContactsByCategory(context);
 
         string[] columns = ["Name", "Email", "Phone Number", "Category"];
         List<string[]> rows = new();
-        
-        foreach( var contact in contacts )
+
+        foreach (var contact in contacts)
         {
             var categoryString = contact.Category != null ? nameof(contact.Category) : "N/A";
             string[] row = [contact.Name, contact.Email, contact.PhoneNumber, categoryString];
@@ -167,6 +167,7 @@ public static class MenuManager
 
         ProcessCreateContact(context);
     }
+    
     private static void ConfirmCategoryDetails(ContactCategory category, ContactContext context)
     {
         DisplayUtils.ClearScreen();
@@ -184,9 +185,32 @@ public static class MenuManager
         ProcessCreateContact(context);
     }
 
+    private static List<ContactEntry> GetContactsByCategory(ContactContext context)
+    {
+        List<ContactEntry> contacts;
+        var category = PromptUserForCategorySelection(context);
+
+        if (category != null)
+        {
+            contacts = context.Contacts.Where(c => c.Category == category).ToList();
+        }
+        else
+        {
+            contacts = context.Contacts.ToList();
+        }
+
+        return contacts;
+    }
+
     private static ContactCategory? PromptUserForCategorySelection(ContactContext context)
     {
         List<ContactCategory> categories = context.ContactCategories.ToList();
+
+        if(categories.Count <= 0)
+        {
+            return null;
+        }
+
         List<string> displayCategories = new();
         string emptyCategoryChoice = "Uncategorized (No Category)";
 
