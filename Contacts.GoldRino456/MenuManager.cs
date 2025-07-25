@@ -12,16 +12,16 @@ public static class MenuManager
         DisplayUtils.ClearScreen();
 
         ContactEntry contact = new();
-        bool isCancellingCreation = false;
+        bool isCancellingOperation = false;
 
-        isCancellingCreation = ProcessNameInput(contact);
-        if (isCancellingCreation) { return; }
+        isCancellingOperation = ProcessNameInput(contact);
+        if (isCancellingOperation) { return; }
 
-        isCancellingCreation = ProcessPhoneInput(contact);
-        if (isCancellingCreation) { return; }
+        isCancellingOperation = ProcessPhoneInput(contact);
+        if (isCancellingOperation) { return; }
 
-        isCancellingCreation = ProcessEmailInput(contact);
-        if (isCancellingCreation) { return; }
+        isCancellingOperation = ProcessEmailInput(contact);
+        if (isCancellingOperation) { return; }
 
         ContactCategory? category = null;
         var isRequestingCategoryPrompt = DisplayUtils.PromptUserForYesOrNoSelection("Would You Like To Add This Contact To A Category?");
@@ -34,6 +34,49 @@ public static class MenuManager
         contact.Category = category;
 
         ConfirmContactDetails(contact, context);
+    }
+
+    public static void ProcessUpdateContact(ContactContext context)
+    {
+        DisplayUtils.ClearScreen();
+        var isCancellingOperation = PromptUserForContactSelection(context, out ContactEntry? selectedContact);
+
+        if(isCancellingOperation)
+        { 
+            return; 
+        }
+
+
+    }
+
+    private static bool PromptUserForContactSelection(ContactContext context, out ContactEntry? selectedContact)
+    {
+        var contacts = GetContactsByCategory(context);
+
+        if (contacts.Count <= 0)
+        {
+            selectedContact = null;
+            DisplayUtils.DisplayMessageToUser("There are not any contacts to display.");
+            DisplayUtils.PressAnyKeyToContinue();
+            return true;
+        }
+
+        Dictionary<string, ContactEntry?> contactPairs = new();
+        foreach (var contact in contacts)
+        {
+            contactPairs.Add(contact.Name, contact);
+        }
+        contactPairs.Add("Go Back To Menu", null);
+
+        var selection = DisplayUtils.PromptUserForSelectionFromList("Which contact would you like to update?", contactPairs.Keys.ToList());
+
+        if(selection.Equals("Go Back To Menu"))
+        {
+            selectedContact = null;
+            return true;
+        }
+        selectedContact = contactPairs[selection];
+        return false;
     }
 
     public static void ProcessViewContacts(ContactContext context)
@@ -60,9 +103,15 @@ public static class MenuManager
         DisplayUtils.ClearScreen();
 
         ContactCategory category = new();
-        bool isCancellingCreation = false;
+        bool isCancellingOperation = false;
 
-        ProcessCategoryInput(category);
+        isCancellingOperation = ProcessCategoryInput(category);
+
+        if (isCancellingOperation)
+        {
+            return;
+        }
+
         ConfirmCategoryDetails(category, context);
     }
 
