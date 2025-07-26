@@ -12,8 +12,6 @@ class Program
             throw new Exception("Could not find connection string.");
         }
 
-        using var context = new ContactContext(connectionString);
-
         //TODO: Add Database Connection Check Here
 
         bool isAppRunning = true;
@@ -25,30 +23,31 @@ class Program
             switch(choice)
             {
                 case MenuOptions.CreateContact:
-                    MenuManager.ProcessCreateContact(context);
+                    MenuManager.ProcessCreateContact(connectionString);
                     break;
 
                 case MenuOptions.UpdateContact:
-                    MenuManager.ProcessUpdateContact(context);
+                    MenuManager.ProcessUpdateContact(connectionString);
                     break;
 
                 case MenuOptions.ViewContacts:
-                    MenuManager.ProcessViewContacts(context);
+                    MenuManager.ProcessViewContacts(connectionString);
                     break;
 
                 case MenuOptions.DeleteContact:
-                    MenuManager.ProcessDeleteContact(context);
+                    MenuManager.ProcessDeleteContact(connectionString);
                     break;
 
                 case MenuOptions.CreateCategory:
-                    MenuManager.ProcessCreateCategory(context);
+                    MenuManager.ProcessCreateCategory(connectionString);
                     break;
 
                 case MenuOptions.UpdateCategory:
-                    MenuManager.ProcessUpdateCategory(context);
+                    MenuManager.ProcessUpdateCategory(connectionString);
                     break;
 
                 case MenuOptions.DeleteCategory:
+                    MenuManager.ProcessDeleteCategory(connectionString);
                     break;
 
                 case MenuOptions.Quit:

@@ -7,6 +7,7 @@ public static class DisplayUtils
     {
         AnsiConsole.Clear();
     }
+
     public static int PromptUserForIndexSelection(string promptText, Dictionary<string, int> choices)
     {
         var selection = AnsiConsole.Prompt(
@@ -85,19 +86,6 @@ public static class DisplayUtils
     public static void DisplayMessageToUser(string message)
     {
         AnsiConsole.WriteLine(message);
-    }
-
-    public static int PromptUserForIntegerInput(string prompt, int min, int max)
-    {
-        var input = AnsiConsole.Prompt(
-            new TextPrompt<int>(prompt)
-            .Validate(n =>
-            {
-                if (n >= max || n < min) { return ValidationResult.Error("Invalid input entered."); }
-                else { return ValidationResult.Success(); }
-            }));
-
-        return input;
     }
 
     public static void PressAnyKeyToContinue()
