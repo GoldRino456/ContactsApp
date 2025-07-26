@@ -20,7 +20,7 @@ public static class DisplayUtils
         return choices[selection];
     }
 
-    public static string PromptUserForSelectionFromList(string promptText,  List<string> choices)
+    public static string PromptUserForSelectionFromList(string promptText, List<string> choices)
     {
         var selection = AnsiConsole.Prompt(
             new SelectionPrompt<string>()

@@ -1,5 +1,4 @@
-﻿
-using PhoneBook.GoldRino456.Data;
+﻿using PhoneBook.GoldRino456.Data;
 using Utilities.GoldRino456;
 
 namespace PhoneBook.GoldRino456;
@@ -283,6 +282,4 @@ public static class MenuHelper
     }
 
     #endregion
-
-
 }

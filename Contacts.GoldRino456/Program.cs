@@ -1,5 +1,4 @@
 ﻿using PhoneBook.GoldRino456;
-using PhoneBook.GoldRino456.Data;
 using System.Text.RegularExpressions;
 using Utilities.GoldRino456;
 
@@ -7,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        if(!AppConfig.FetchConnectionString(out var connectionString))
+        if (!AppConfig.FetchConnectionString(out var connectionString))
         {
             throw new Exception("Could not find connection string.");
         }
@@ -15,12 +14,12 @@ class Program
         //TODO: Add Database Connection Check Here
 
         bool isAppRunning = true;
-        while(isAppRunning)
+        while (isAppRunning)
         {
             DisplayUtils.ClearScreen();
             var choice = DisplayMainMenu();
 
-            switch(choice)
+            switch (choice)
             {
                 case MenuOptions.CreateContact:
                     MenuManager.ProcessCreateContact(connectionString);
@@ -61,13 +60,13 @@ class Program
     private static MenuOptions DisplayMainMenu()
     {
         Dictionary<string, int> menuOptionPairs = new();
-        foreach(var option in Enum.GetValues(typeof(MenuOptions)))
+        foreach (var option in Enum.GetValues(typeof(MenuOptions)))
         {
             var displayText = Regex.Replace(option.ToString(), "(\\B[A-Z])", " $1"); //https://stackoverflow.com/questions/5796383/insert-spaces-between-words-on-a-camel-cased-token
             menuOptionPairs.Add(displayText, (int)option);
         }
 
-        return (MenuOptions) DisplayUtils.PromptUserForIndexSelection("What Would You Like To Do?", menuOptionPairs);
+        return (MenuOptions)DisplayUtils.PromptUserForIndexSelection("What Would You Like To Do?", menuOptionPairs);
     }
 
     enum MenuOptions

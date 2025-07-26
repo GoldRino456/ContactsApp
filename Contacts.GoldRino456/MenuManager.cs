@@ -74,24 +74,21 @@ public static class MenuManager
     public static void ProcessCreateCategory(string connectionString)
     {
         ContactContext context = new(connectionString);
-        while (true)
+        DisplayUtils.ClearScreen();
+
+        ContactCategory category = new();
+        bool isCancellingOperation = false;
+
+        isCancellingOperation = MenuHelper.ProcessCategoryInput(category);
+
+        if (isCancellingOperation)
         {
-            DisplayUtils.ClearScreen();
+            return;
+        }
 
-            ContactCategory category = new();
-            bool isCancellingOperation = false;
-
-            isCancellingOperation = MenuHelper.ProcessCategoryInput(category);
-
-            if (isCancellingOperation)
-            {
-                return;
-            }
-
-            if (MenuHelper.ConfirmCategoryDetails(category, context, true))
-            {
-                return;
-            }
+        if (MenuHelper.ConfirmCategoryDetails(category, context, true))
+        {
+            return;
         }
     }
 
