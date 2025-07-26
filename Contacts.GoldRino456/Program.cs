@@ -1,4 +1,5 @@
 ﻿using PhoneBook.GoldRino456;
+using PhoneBook.GoldRino456.Data;
 using System.Text.RegularExpressions;
 using Utilities.GoldRino456;
 
@@ -6,12 +7,15 @@ class Program
 {
     static void Main()
     {
-        if (!AppConfig.FetchConnectionString(out var connectionString))
+        if (!ValidateConnectionString(out var connectionString))
         {
-            throw new Exception("Could not find connection string.");
+            return;
         }
 
-        //TODO: Add Database Connection Check Here
+        if (!ValidateDatabaseConnection(connectionString))
+        {
+            return;
+        }
 
         bool isAppRunning = true;
         while (isAppRunning)
@@ -55,6 +59,35 @@ class Program
 
             }
         }
+    }
+
+    private static bool ValidateConnectionString(out string? connectionString)
+    {
+        if (!AppConfig.FetchConnectionString(out connectionString))
+        {
+            DisplayUtils.DisplayMessageToUser("No connection string found in appsettings.json. Application will close.");
+            DisplayUtils.PressAnyKeyToContinue();
+            return false;
+        }
+
+        return true;
+    }
+
+    private static bool ValidateDatabaseConnection(string? connectionString)
+    {
+        using (var context = new ContactContext(connectionString))
+        {
+            DisplayUtils.DisplayMessageToUser("Attempting connection to SQL Server database... please wait...");
+
+            if (!context.Database.CanConnect())
+            {
+                DisplayUtils.DisplayMessageToUser("Could not connect to the SQL Server database. Application will close.");
+                DisplayUtils.PressAnyKeyToContinue();
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static MenuOptions DisplayMainMenu()
