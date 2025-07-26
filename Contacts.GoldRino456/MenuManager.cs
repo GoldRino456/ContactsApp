@@ -94,7 +94,7 @@ public static class MenuManager
 
         foreach (var contact in contacts)
         {
-            var categoryString = contact.Category != null ? nameof(contact.Category) : "N/A";
+            var categoryString = contact.Category != null ? contact.Category.Name : "N/A";
             string[] row = [contact.Name, contact.Email, contact.PhoneNumber, categoryString];
             rows.Add(row);
         }
