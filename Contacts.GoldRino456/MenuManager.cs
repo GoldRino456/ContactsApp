@@ -9,34 +9,39 @@ public static class MenuManager
 {
     public static void ProcessCreateContact(ContactContext context)
     {
-        DisplayUtils.ClearScreen();
-
         ContactEntry contact = new();
+        DisplayUtils.ClearScreen();
         CollectContactDetails(contact, context, true);
     }
 
     private static void CollectContactDetails(ContactEntry contact, ContactContext context, bool isNewContact)
     {
-        bool isCancellingOperation = ProcessNameInput(contact);
-        if (isCancellingOperation) { return; }
-
-        isCancellingOperation = ProcessPhoneInput(contact);
-        if (isCancellingOperation) { return; }
-
-        isCancellingOperation = ProcessEmailInput(contact);
-        if (isCancellingOperation) { return; }
-
-        ContactCategory? category = null;
-        var isRequestingCategoryPrompt = DisplayUtils.PromptUserForYesOrNoSelection("Would You Like To Add This Contact To A Category?");
-
-        if (isRequestingCategoryPrompt)
+        while(true)
         {
-            category = PromptUserForCategorySelection(context);
+            bool isCancellingOperation = ProcessNameInput(contact);
+            if (isCancellingOperation) { return; }
+
+            isCancellingOperation = ProcessPhoneInput(contact);
+            if (isCancellingOperation) { return; }
+
+            isCancellingOperation = ProcessEmailInput(contact);
+            if (isCancellingOperation) { return; }
+
+            ContactCategory? category = null;
+            var isRequestingCategoryPrompt = DisplayUtils.PromptUserForYesOrNoSelection("Would You Like To Add This Contact To A Category?");
+
+            if (isRequestingCategoryPrompt)
+            {
+                category = PromptUserForCategorySelection(context, "Uncategorized (No Category)");
+            }
+
+            contact.Category = category;
+
+            if (ConfirmContactDetails(contact, context, isNewContact))
+            {
+                return;
+            }
         }
-
-        contact.Category = category;
-
-        ConfirmContactDetails(contact, context, isNewContact);
     }
 
     public static void ProcessUpdateContact(ContactContext context)
@@ -49,7 +54,6 @@ public static class MenuManager
             return; 
         }
 
-        DisplayUtils.ClearScreen();
         DisplaySingleContact(selectedContact);
         CollectContactDetails(selectedContact, context, false);
     }
@@ -105,19 +109,80 @@ public static class MenuManager
 
     public static void ProcessCreateCategory(ContactContext context)
     {
+        while(true)
+        {
+            DisplayUtils.ClearScreen();
+
+            ContactCategory category = new();
+            bool isCancellingOperation = false;
+
+            isCancellingOperation = ProcessCategoryInput(category);
+
+            if (isCancellingOperation)
+            {
+                return;
+            }
+
+            if(ConfirmCategoryDetails(category, context, true))
+            {
+                return;
+            }
+        }
+    }
+
+    public static void ProcessUpdateCategory(ContactContext context)
+    {
+        while(true)
+        {
+            DisplayUtils.ClearScreen();
+
+            if (!CheckForExistingCategories(context))
+            {
+                DisplayUtils.DisplayMessageToUser("No categories exist to update!");
+                DisplayUtils.PressAnyKeyToContinue();
+                return;
+            }
+
+            var category = PromptUserForCategorySelection(context, "Go Back To Menu");
+            if (category == null)
+            {
+                return;
+            }
+
+            DisplaySingleCategory(category);
+            var isCancellingOperation = ProcessCategoryInput(category);
+
+            if (isCancellingOperation)
+            {
+                return;
+            }
+
+            if (ConfirmCategoryDetails(category, context, false))
+            {
+                return;
+            }
+        }
+    }
+
+    public static void ProcessDeleteContact(ContactContext context)
+    {
         DisplayUtils.ClearScreen();
-
-        ContactCategory category = new();
-        bool isCancellingOperation = false;
-
-        isCancellingOperation = ProcessCategoryInput(category);
+        var isCancellingOperation = PromptUserForContactSelection(context, out ContactEntry? selectedContact);
 
         if (isCancellingOperation)
         {
             return;
         }
 
-        ConfirmCategoryDetails(category, context);
+        DisplayUtils.ClearScreen();
+        DisplaySingleContact(selectedContact);
+        var isDeleteConfirmed = DisplayUtils.PromptUserForYesOrNoSelection("Are you sure you want to delete this contact?");
+
+        if (isDeleteConfirmed)
+        {
+            context.Contacts.Remove(selectedContact);
+            context.SaveChanges();
+        }
     }
 
     private static bool ProcessEmailInput(ContactEntry contact)
@@ -200,7 +265,7 @@ public static class MenuManager
         return false;
     }
 
-    private static void ConfirmContactDetails(ContactEntry contact, ContactContext context, bool isNewContact)
+    private static bool ConfirmContactDetails(ContactEntry contact, ContactContext context, bool isNewContact)
     {
         DisplayUtils.ClearScreen();
         DisplayUtils.DisplayMessageToUser($"Contact Name: {contact.Name} \nEmail: {contact.Email} \nPhone Number: {contact.PhoneNumber}");
@@ -218,34 +283,43 @@ public static class MenuManager
             {
                 context.Contacts.Add(contact);
                 context.SaveChanges();
-                return;
+                return true;
             }
             else
             {
                 context.Contacts.Update(contact);
                 context.SaveChanges();
-                return;
+                return true;
             }
         }
 
-        ProcessCreateContact(context);
+        return false;
     }
     
-    private static void ConfirmCategoryDetails(ContactCategory category, ContactContext context)
+    private static bool ConfirmCategoryDetails(ContactCategory category, ContactContext context, bool isNewCategory)
     {
         DisplayUtils.ClearScreen();
         DisplayUtils.DisplayMessageToUser($"New Category Name: {category.Name}");
 
-        var isCorrect = DisplayUtils.PromptUserForYesOrNoSelection("Are you sure you want to create a new category with this name?");
+        var isCorrect = DisplayUtils.PromptUserForYesOrNoSelection("Is the category name above correct?");
 
         if (isCorrect)
         {
-            context.ContactCategories.Add(category);
-            context.SaveChanges();
-            return;
+            if(isNewCategory)
+            {
+                context.ContactCategories.Add(category);
+                context.SaveChanges();
+                return true;
+            }
+            else
+            {
+                context.ContactCategories.Update(category);
+                context.SaveChanges();
+                return true;
+            }
         }
 
-        ProcessCreateContact(context);
+        return false;
     }
 
     private static void DisplaySingleContact(ContactEntry contact)
@@ -261,10 +335,16 @@ public static class MenuManager
         DisplayUtils.DisplayListAsTable(columns, rows);
     }
 
+    private static void DisplaySingleCategory(ContactCategory category)
+    {
+        DisplayUtils.ClearScreen();
+        DisplayUtils.DisplayMessageToUser($"Category Name: {category.Name}");
+    }
+
     private static List<ContactEntry> GetContactsByCategory(ContactContext context)
     {
         List<ContactEntry> contacts;
-        var category = PromptUserForCategorySelection(context);
+        var category = PromptUserForCategorySelection(context, "Uncategorized (No Category)");
 
         if (category != null)
         {
@@ -278,7 +358,7 @@ public static class MenuManager
         return contacts;
     }
 
-    private static ContactCategory? PromptUserForCategorySelection(ContactContext context)
+    private static ContactCategory? PromptUserForCategorySelection(ContactContext context, string emptyCategoryText)
     {
         List<ContactCategory> categories = context.ContactCategories.ToList();
 
@@ -288,7 +368,6 @@ public static class MenuManager
         }
 
         List<string> displayCategories = new();
-        string emptyCategoryChoice = "Uncategorized (No Category)";
 
 
         foreach (ContactCategory category in categories)
@@ -296,15 +375,25 @@ public static class MenuManager
             displayCategories.Add(category.Name);
         }
 
-        displayCategories.Add(emptyCategoryChoice);
+        displayCategories.Add(emptyCategoryText);
 
         var categoryChoice = DisplayUtils.PromptUserForSelectionFromList("Please select a category: ", displayCategories);
 
-        if(categoryChoice.Equals(emptyCategoryChoice))
+        if(categoryChoice.Equals(emptyCategoryText))
         {
             return null;
         }
 
         return context.ContactCategories.Where(c => c.Name.Equals(categoryChoice)).First();
+    }
+
+    private static bool CheckForExistingCategories(ContactContext context)
+    {
+        return context.ContactCategories.Any();
+    }
+
+    private static bool CheckForExistingContacts(ContactContext context)
+    {
+        return context.Contacts.Any();
     }
 }

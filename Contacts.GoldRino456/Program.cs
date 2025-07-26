@@ -37,6 +37,7 @@ class Program
                     break;
 
                 case MenuOptions.DeleteContact:
+                    MenuManager.ProcessDeleteContact(context);
                     break;
 
                 case MenuOptions.CreateCategory:
@@ -44,6 +45,7 @@ class Program
                     break;
 
                 case MenuOptions.UpdateCategory:
+                    MenuManager.ProcessUpdateCategory(context);
                     break;
 
                 case MenuOptions.DeleteCategory:
